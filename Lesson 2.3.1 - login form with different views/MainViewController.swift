@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UITextFieldDelegate {
+class MainViewController: UIViewController {
 
     @IBOutlet var inputUserName: UITextField!
     @IBOutlet var inputPassword: UITextField!
@@ -26,8 +26,11 @@ class MainViewController: UIViewController, UITextFieldDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let accountViewController = segue.destination as? AccountViewController else { return }
-        accountViewController.userName = inputUserName.text
+        guard let accountTabBarViewController = segue.destination as? UITabBarController else { return }
+        for viewContoller in accountTabBarViewController.children {
+            guard let accountViewContoller = viewContoller as? AccountViewController else { return }
+            accountViewContoller.userName = inputUserName.text
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -41,28 +44,22 @@ class MainViewController: UIViewController, UITextFieldDelegate {
     @IBAction func logInButtonClicked() {
         if !canLogin() {
             
-            clearInputs()
-            
-            // заметил, что если перенести эту строку за вызов алерта, фокус не перейдет
-            // на инпут для логина
-            inputUserName.becomeFirstResponder()
-            
             alertWithAction(
                 title: "Incorrect",
                 description: "Incorrect Username or Password",
                 buttonTitle: "Try again"
             )
             
+            clearInputs()
+            
+            inputUserName.becomeFirstResponder()
+            
+            
+            
             return
         }
-        
-        // похоже, что алерт прерывает сигвей, но меня не покидает чувство, что сделал-таки неверно
-        // так как если закомментировать алерт, сигвей все равно пройдет
-        // но если я пробую дернуть сигвей вручную - он все равно должен быть связан с какой-то
-        // кнопкой... отвязать его от текущей кнопки, сделать невидимую или невидимый элемент навигации?
-        // и далее дергать таким образом, как в примере ниже?
-        //
-        // performSegue(withIdentifier: "accountSegue", sender: nil)
+    
+        performSegue(withIdentifier: "accountSegue", sender: nil)
     }
     
     @IBAction func forgotUserNameButtonClicked() {
@@ -107,3 +104,7 @@ class MainViewController: UIViewController, UITextFieldDelegate {
     
 }
 
+extension MainViewController: UITextFieldDelegate {
+    
+    
+}
